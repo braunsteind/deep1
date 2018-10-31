@@ -1,8 +1,7 @@
 import numpy as np
 
-STUDENT = {'name': 'YOUR NAME',
-           'ID': 'YOUR ID NUMBER'}
-
+STUDENT={'name': 'YOUR NAME',
+         'ID': 'YOUR ID NUMBER'}
 
 def softmax(x):
     """
@@ -16,20 +15,27 @@ def softmax(x):
     # With a vectorized implementation, the code should be no more than 2 lines.
     #
     # For numeric stability, use the identify you proved in Ex 2 Q1.
-    e_x = np.exp(x - np.max(x))
-    return np.divide(e_x, np.sum(e_x))
 
+    #Whats up with that max subtraction
+    #Softmax function is prone to two issues: overflow and underflow
+    #Overflow: It occurs when very large numbers are approximated as infinity
+    #Underflow: It occurs when very small numbers (near zero in the number line) are approximated (i.e. rounded to) as zero
+    # a common trick is to shift the input vector by subtracting the maximum element in it from all elements
+    e_x = np.exp(x - np.max(x))
+    x = np.divide(e_x,np.sum(e_x))
+    return x
+    
 
 def classifier_output(x, params):
     """
     Return the output layer (class probabilities) 
     of a log-linear classifier with given params on input x.
     """
-    W, b = params
+    W,b = params
     # YOUR CODE HERE.
-    probs = softmax(np.dot(x, W) + b)
+    #compute softmax on wx+b
+    probs = softmax(np.dot(x,W)+b)
     return probs
-
 
 def predict(x, params):
     """
@@ -41,7 +47,6 @@ def predict(x, params):
     b: vector
     """
     return np.argmax(classifier_output(x, params))
-
 
 def loss_and_gradients(x, y, params):
     """
@@ -55,17 +60,21 @@ def loss_and_gradients(x, y, params):
     gW: matrix, gradients of W
     gb: vector, gradients of b
     """
-    W, b = params
+    W,b = params
     # YOU CODE HERE
-    y_hat = classifier_output(x, params)
-    y_real = np.zeros(y_hat.shape)
-    y_real[y] = 1
-    loss = -np.log(y_hat[y])
-    g_loss_y_hat = -(y_real - y_hat)
-    gW = np.outer(x, g_loss_y_hat)
-    gb = g_loss_y_hat
-    return loss, [gW, gb]
+    #compute y'
+    y_predict = classifier_output(x,params)
+    #compute the loss at point x
+    loss = -np.log(y_predict[y])
 
+    #compute gb: vector, gradients of b
+    y_predict[y] -= 1
+    gb = y_predict
+
+    #compute gW: matrix, gradients of W
+    gW = np.outer(x,y_predict)
+
+    return loss,[gW,gb]
 
 def create_classifier(in_dim, out_dim):
     """
@@ -74,45 +83,45 @@ def create_classifier(in_dim, out_dim):
     """
     W = np.zeros((in_dim, out_dim))
     b = np.zeros(out_dim)
-    return [W, b]
-
+    return [W,b]
 
 if __name__ == '__main__':
     # Sanity checks for softmax. If these fail, your softmax is definitely wrong.
     # If these pass, it may or may not be correct.
-    test1 = softmax(np.array([1, 2]))
+    test1 = softmax(np.array([1,2]))
     print test1
-    assert np.amax(np.fabs(test1 - np.array([0.26894142, 0.73105858]))) <= 1e-6
+    assert np.amax(np.fabs(test1 - np.array([0.26894142,  0.73105858]))) <= 1e-6
 
-    test2 = softmax(np.array([1001, 1002]))
+    test2 = softmax(np.array([1001,1002]))
     print test2
-    assert np.amax(np.fabs(test2 - np.array([0.26894142, 0.73105858]))) <= 1e-6
+    assert np.amax(np.fabs(test2 - np.array( [0.26894142, 0.73105858]))) <= 1e-6
 
-    test3 = softmax(np.array([-1001, -1002]))
-    print test3
+    test3 = softmax(np.array([-1001,-1002])) 
+    print test3 
     assert np.amax(np.fabs(test3 - np.array([0.73105858, 0.26894142]))) <= 1e-6
+
 
     # Sanity checks. If these fail, your gradient calculation is definitely wrong.
     # If they pass, it is likely, but not certainly, correct.
     from grad_check import gradient_check
 
-    W, b = create_classifier(3, 4)
-
+    W,b = create_classifier(3,4)
 
     def _loss_and_W_grad(W):
         global b
-        loss, grads = loss_and_gradients([1, 2, 3], 0, [W, b])
-        return loss, grads[0]
-
+        loss,grads = loss_and_gradients([1,2,3],0,[W,b])
+        return loss,grads[0]
 
     def _loss_and_b_grad(b):
         global W
-        loss, grads = loss_and_gradients([1, 2, 3], 0, [W, b])
-        return loss, grads[1]
-
+        loss,grads = loss_and_gradients([1,2,3],0,[W,b])
+        return loss,grads[1]
 
     for _ in xrange(10):
-        W = np.random.randn(W.shape[0], W.shape[1])
+        W = np.random.randn(W.shape[0],W.shape[1])
         b = np.random.randn(b.shape[0])
         gradient_check(_loss_and_b_grad, b)
         gradient_check(_loss_and_W_grad, W)
+
+
+    

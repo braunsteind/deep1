@@ -72,26 +72,30 @@ def loss_and_gradients(x, y, params):
     return my_grades,loss
 
 def init_uniform_parameter(epsilon,first_dim,second_dim):
-    if second_dim==0:
-        return np.random.uniform(-epsilon,epsilon,first_dim)
-    else:
-        return np.random.uniform(-epsilon,epsilon,[first_dim,second_dim])
+    return np.random.uniform(-epsilon,epsilon,[first_dim,second_dim])
 
 
 
 def init_parameters(in_dim, hid_dim, result_dim):
+    #prevent from repeating calculate
     sqrt_six = np.sqrt(6)
     epsilon = sqrt_six/(np.sqrt(in_dim+hid_dim))
+
+    #w1 size 30x600 , x: 600x1 -> wx: 30x1
     w1 = init_uniform_parameter(epsilon,hid_dim,in_dim)
 
     epsilon = sqrt_six/(np.sqrt(hid_dim))
-    b1 = init_uniform_parameter(epsilon,hid_dim,0)
 
+    #b1 size: 30x1
+    b1 = init_uniform_parameter(epsilon,hid_dim,1)
+
+    #w2: 10x30 A1: 30x1 -> w2xA1 : 10x1
     epsilon = sqrt_six / (np.sqrt(hid_dim+result_dim))
     w2 = init_uniform_parameter(epsilon,result_dim,hid_dim)
 
     epsilon = sqrt_six / (np.sqrt(result_dim))
-    b2 = init_uniform_parameter(epsilon, result_dim, 0)
+    #b2: 10x1
+    b2 = init_uniform_parameter(epsilon, result_dim, 1)
 
     return [w1,b1,w2,b2]
 
@@ -116,13 +120,10 @@ def create_classifier(in_dim, hid_dim, out_dim):
 
 
     """
-
-
   #A good boot method is to initialize in random values between Epsilon and Epsilon A good boot method is to
   # initialize in random values between Epsilon and Epsilon And initializes values in the middle range of the function rather than in the areas of the cytometry
 
-
-    params = init_parameters(in_dim,hid_dim,out_dim)
+    params = init_parameters(in_dim, hid_dim, out_dim)
     return params
 
 def than(z):
@@ -153,7 +154,6 @@ def forward_propagation_action(x,params):
                     'A1': A1,
                     'z2': z2,
                     'A2': A2}
-
 
     return result_model
 

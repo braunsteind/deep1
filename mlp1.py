@@ -25,6 +25,7 @@ def tanh_deriv_function(x):
     return 1 - np.power(x,2)
 
 def loss_and_gradients(x, y, params):
+
     """
     params: a list of the form [W, b, U, b_tag]
 
@@ -51,28 +52,40 @@ def loss_and_gradients(x, y, params):
     num_class = len(A2)
 
     y_vector = np.zeros(num_class)
+    # print('y_vector:', y_vector.shape)
     #create a vector represent y
     y_vector[y] = 1
 
     db2 = loss_deriv(y_vector,A2)
+   # print('db2:', db2.shape)
+    #print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+
 
     dw2 = np.outer(db2,A1)
+    #print('dw2:', dw2.shape)
 
-    db1 = np.dot(db2,w2) * tanh_deriv_function(A1)
+    db1 = np.dot(db2.T,w2) * tanh_deriv_function(A1)
+   # print('db1:', db1.shape)
 
     dw1 = np.outer(db1,A0)
+   # print('A0:', A0.shape)
+    #print('dw1:', dw1.shape)
 
     loss = -np.log(A2[y])
+   # print('A2:', A2.shape)
 
     my_grades = {'dw2': dw2,
                  'db2': db2,
                  'dw1': dw1,
                  'db1': db1}
 
-    return my_grades,loss
+    return loss, my_grades
 
 def init_uniform_parameter(epsilon,first_dim,second_dim):
-    return np.random.uniform(-epsilon,epsilon,[first_dim,second_dim])
+    if second_dim==1:
+        return np.random.uniform(-epsilon, epsilon, first_dim)
+    else:
+        return np.random.uniform(-epsilon,epsilon,[first_dim,second_dim])
 
 
 
@@ -83,19 +96,23 @@ def init_parameters(in_dim, hid_dim, result_dim):
 
     #w1 size 30x600 , x: 600x1 -> wx: 30x1
     w1 = init_uniform_parameter(epsilon,hid_dim,in_dim)
+    print('w1:', w1.shape)
 
     epsilon = sqrt_six/(np.sqrt(hid_dim))
 
     #b1 size: 30x1
     b1 = init_uniform_parameter(epsilon,hid_dim,1)
+    print('b1:',b1.shape)
 
     #w2: 10x30 A1: 30x1 -> w2xA1 : 10x1
     epsilon = sqrt_six / (np.sqrt(hid_dim+result_dim))
     w2 = init_uniform_parameter(epsilon,result_dim,hid_dim)
+    print('w2:',w2.shape)
 
     epsilon = sqrt_six / (np.sqrt(result_dim))
     #b2: 10x1
     b2 = init_uniform_parameter(epsilon, result_dim, 1)
+    print('b2:',b2.shape)
 
     return [w1,b1,w2,b2]
 
@@ -136,18 +153,23 @@ def forward_propagation_action(x,params):
     w2 = params[2]
     b2 = params[3]
 
+
+    #print('w1dotx:', np.dot(w1,x).shape)
+    #print('x:', x.shape)
     # compute Z1: input layer matrix dot w1 wheight matrix plus our bias
     z1 = np.dot(w1,x)+b1
+    #print('z1:', z1.shape)
 
     # put it throgh our activition function
     A1 = than(z1)
+   # print('A1:', A1.shape)
 
     # compute Z2:
     z2 =np.dot(w2,A1)+b2
-
+   # print('z2:', z2.shape)
     # now, we'll use the softmax as our activition function
     A2 = ll.softmax(z2)
-
+   # print('A2:', A2.shape)
     # save all results as a model
     result_model = {'A0': x,
                     'z1': z1,

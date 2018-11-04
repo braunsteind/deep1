@@ -1,16 +1,19 @@
 import loglinear as ll
 import numpy as np
-#check
+
+# check
 
 
-STUDENT={'name': 'YOUR NAME',
-         'ID': 'YOUR ID NUMBER'}
+STUDENT = {'name': 'Daniel Braunstein',
+           'ID': '312510167'}
+
 
 def classifier_output(x, params):
     # YOUR CODE HERE.
-    feed_forward_model = forward_propagation_action(x,params)
-    probs =  feed_forward_model['A2']
+    feed_forward_model = forward_propagation_action(x, params)
+    probs = feed_forward_model['A2']
     return probs
+
 
 def predict(x, params):
     """
@@ -18,14 +21,16 @@ def predict(x, params):
     """
     return np.argmax(classifier_output(x, params))
 
-def loss_deriv(y,y_hat):
+
+def loss_deriv(y, y_hat):
     return y_hat - y
 
+
 def tanh_deriv_function(x):
-    return 1 - np.power(x,2)
+    return 1 - np.power(x, 2)
+
 
 def loss_and_gradients(x, y, params):
-
     """
     params: a list of the form [W, b, U, b_tag]
 
@@ -44,7 +49,7 @@ def loss_and_gradients(x, y, params):
     w2 = params[2]
     b2 = params[3]
 
-    forward_model = forward_propagation_action(x,params)
+    forward_model = forward_propagation_action(x, params)
     A0 = forward_model['A0']
     A1 = forward_model['A1']
     A2 = forward_model['A2']
@@ -53,26 +58,25 @@ def loss_and_gradients(x, y, params):
 
     y_vector = np.zeros(num_class)
     # print('y_vector:', y_vector.shape)
-    #create a vector represent y
+    # create a vector represent y
     y_vector[y] = 1
 
-    db2 = loss_deriv(y_vector,A2)
-   # print('db2:', db2.shape)
-    #print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    db2 = loss_deriv(y_vector, A2)
+    # print('db2:', db2.shape)
+    # print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
 
+    dw2 = np.outer(db2, A1)
+    # print('dw2:', dw2.shape)
 
-    dw2 = np.outer(db2,A1)
-    #print('dw2:', dw2.shape)
+    db1 = np.dot(db2.T, w2) * tanh_deriv_function(A1)
+    # print('db1:', db1.shape)
 
-    db1 = np.dot(db2.T,w2) * tanh_deriv_function(A1)
-   # print('db1:', db1.shape)
-
-    dw1 = np.outer(db1,A0)
-   # print('A0:', A0.shape)
-    #print('dw1:', dw1.shape)
+    dw1 = np.outer(db1, A0)
+    # print('A0:', A0.shape)
+    # print('dw1:', dw1.shape)
 
     loss = -np.log(A2[y])
-   # print('A2:', A2.shape)
+    # print('A2:', A2.shape)
 
     my_grades = {'dw2': dw2,
                  'db2': db2,
@@ -81,49 +85,40 @@ def loss_and_gradients(x, y, params):
 
     return loss, my_grades
 
-def init_uniform_parameter(epsilon,first_dim,second_dim):
-    if second_dim==1:
+
+def init_uniform_parameter(epsilon, first_dim, second_dim):
+    if second_dim == 1:
         return np.random.uniform(-epsilon, epsilon, first_dim)
     else:
-        return np.random.uniform(-epsilon,epsilon,[first_dim,second_dim])
-
+        return np.random.uniform(-epsilon, epsilon, [first_dim, second_dim])
 
 
 def init_parameters(in_dim, hid_dim, result_dim):
-    #prevent from repeating calculate
+    # prevent from repeating calculate
     sqrt_six = np.sqrt(6)
-    epsilon = sqrt_six/(np.sqrt(in_dim+hid_dim))
+    epsilon = sqrt_six / (np.sqrt(in_dim + hid_dim))
 
-    #w1 size 30x600 , x: 600x1 -> wx: 30x1
-    w1 = init_uniform_parameter(epsilon,hid_dim,in_dim)
+    # w1 size 30x600 , x: 600x1 -> wx: 30x1
+    w1 = init_uniform_parameter(epsilon, hid_dim, in_dim)
     print('w1:', w1.shape)
 
-    epsilon = sqrt_six/(np.sqrt(hid_dim))
+    epsilon = sqrt_six / (np.sqrt(hid_dim))
 
-    #b1 size: 30x1
-    b1 = init_uniform_parameter(epsilon,hid_dim,1)
-    print('b1:',b1.shape)
+    # b1 size: 30x1
+    b1 = init_uniform_parameter(epsilon, hid_dim, 1)
+    print('b1:', b1.shape)
 
-    #w2: 10x30 A1: 30x1 -> w2xA1 : 10x1
-    epsilon = sqrt_six / (np.sqrt(hid_dim+result_dim))
-    w2 = init_uniform_parameter(epsilon,result_dim,hid_dim)
-    print('w2:',w2.shape)
+    # w2: 10x30 A1: 30x1 -> w2xA1 : 10x1
+    epsilon = sqrt_six / (np.sqrt(hid_dim + result_dim))
+    w2 = init_uniform_parameter(epsilon, result_dim, hid_dim)
+    print('w2:', w2.shape)
 
     epsilon = sqrt_six / (np.sqrt(result_dim))
-    #b2: 10x1
+    # b2: 10x1
     b2 = init_uniform_parameter(epsilon, result_dim, 1)
-    print('b2:',b2.shape)
+    print('b2:', b2.shape)
 
-    return [w1,b1,w2,b2]
-
-
-
-
-
-
-
-
-
+    return [w1, b1, w2, b2]
 
 
 def create_classifier(in_dim, hid_dim, out_dim):
@@ -137,39 +132,40 @@ def create_classifier(in_dim, hid_dim, out_dim):
 
 
     """
-  #A good boot method is to initialize in random values between Epsilon and Epsilon A good boot method is to
-  # initialize in random values between Epsilon and Epsilon And initializes values in the middle range of the function rather than in the areas of the cytometry
+    # A good boot method is to initialize in random values between Epsilon and Epsilon A good boot method is to
+    # initialize in random values between Epsilon and Epsilon And initializes values in the middle range of the function rather than in the areas of the cytometry
 
     params = init_parameters(in_dim, hid_dim, out_dim)
     return params
 
+
 def than(z):
     return np.tanh(z)
 
-def forward_propagation_action(x,params):
+
+def forward_propagation_action(x, params):
     # first load the model parameters
     w1 = params[0]
     b1 = params[1]
     w2 = params[2]
     b2 = params[3]
 
-
-    #print('w1dotx:', np.dot(w1,x).shape)
-    #print('x:', x.shape)
+    # print('w1dotx:', np.dot(w1,x).shape)
+    # print('x:', x.shape)
     # compute Z1: input layer matrix dot w1 wheight matrix plus our bias
-    z1 = np.dot(w1,x)+b1
-    #print('z1:', z1.shape)
+    z1 = np.dot(w1, x) + b1
+    # print('z1:', z1.shape)
 
     # put it throgh our activition function
     A1 = than(z1)
-   # print('A1:', A1.shape)
+    # print('A1:', A1.shape)
 
     # compute Z2:
-    z2 =np.dot(w2,A1)+b2
-   # print('z2:', z2.shape)
+    z2 = np.dot(w2, A1) + b2
+    # print('z2:', z2.shape)
     # now, we'll use the softmax as our activition function
     A2 = ll.softmax(z2)
-   # print('A2:', A2.shape)
+    # print('A2:', A2.shape)
     # save all results as a model
     result_model = {'A0': x,
                     'z1': z1,
@@ -178,6 +174,3 @@ def forward_propagation_action(x,params):
                     'A2': A2}
 
     return result_model
-
-
-

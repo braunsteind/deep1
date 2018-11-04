@@ -5,6 +5,12 @@ STUDENT={'name': 'YOUR NAME',
 
 def classifier_output(x, params):
     # YOUR CODE HERE.
+    activation_i = x
+    num_of_parameters = len(params)
+    #loop with jumping 2, to get each time currents w and b
+    for index in range(0,num_of_parameters,2):
+
+
     return probs
 
 def predict(x, params):
@@ -51,5 +57,22 @@ def create_classifier(dims):
     second layer, and so on.
     """
     params = []
+    params = init_parameters(dims)
     return params
+
+def init_parameters(dims_list):
+    #prevent from repeating calculate
+    sqrt_six = np.sqrt(6)
+    parameters_list=[]
+    #dims_list[1:] is the same as dims_list just without first argument
+    for x,y in zip(dims_list,dims_list[1:]):
+        epsilon = sqrt_six/(np.sqrt(x+y))
+        w=np.random.uniform(-epsilon,epsilon,[x,y])
+        parameters_list.append(w)
+        epsilon = sqrt_six/(np.sqrt(y))
+        b=np.random.uniform(-epsilon,epsilon,y)
+        parameters_list.append(b)
+    return parameters_list
+
+
 

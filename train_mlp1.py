@@ -3,8 +3,8 @@ import mlp1 as mlp1
 import utils as utils
 import random
 
-STUDENT = {'name': 'Daniel Braunstein',
-           'ID': '312510167'}
+STUDENT = {'name': 'YOUR NAME',
+           'ID': 'YOUR ID NUMBER'}
 
 
 def vector_normalization(vec):
@@ -62,8 +62,7 @@ def accuracy_on_dataset(dataset, params):
             bad = bad + 1
     return good / (good + bad)
 
-
-def update_rule_params(grades, learning_rate, params):
+def update_rule_params(grades,learning_rate,params):
     # Load parameters
     # w1 = params[0]
     # b1 = params[1]
@@ -75,6 +74,8 @@ def update_rule_params(grades, learning_rate, params):
     params[1] -= grades['db1'] * learning_rate
     params[2] -= grades['dw2'] * learning_rate
     params[3] -= grades['db2'] * learning_rate
+
+
 
 
 def train_classifier(train_data, dev_data, num_iterations, learning_rate, params):
@@ -93,11 +94,11 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, params
         for label, features in train_data:
             # convert features to a vector.
             x = feats_to_vec(features)
-            # print (x.shape)
+            #print (x.shape)
             language_label = utils.L2I[label]
             y = language_label  # convert the label to number if needed.
             loss, grads = mlp1.loss_and_gradients(x, y, params)
-            # print 'helllllll'
+            #print 'helllllll'
             cum_loss += loss
             # YOUR CODE HERE
             # update the parameters according to the gradients
@@ -105,7 +106,7 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, params
             # update b matrix - rule update : b = b -n * gradientB
 
             update_rule_params(grads, learning_rate, params)
-        # print('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
+        #print('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
 
         train_loss = cum_loss / len(train_data)
         train_accuracy = accuracy_on_dataset(train_data, params)
@@ -131,6 +132,6 @@ if __name__ == '__main__':
     learning_rate = 0.05
     hidden_dim = 20
 
-    params = mlp1.create_classifier(in_dim, hidden_dim, out_dim)
+    params = mlp1.create_classifier(in_dim,hidden_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params)
     CreatePredictionsFile(train_data, trained_params)
